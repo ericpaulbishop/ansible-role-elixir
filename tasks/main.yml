@@ -1,0 +1,62 @@
+---
+
+- name: Test for presence of desired version of Erlang
+  shell: "cat '/etc/erlang_version' || echo ''"
+  register: current_erlang_version
+
+- name: Test for presence of desired version of Elixir
+  shell: "cat '/etc/elixir_version' || echo ''"
+  register: current_elixir_version
+
+- name: Update APT cache
+  apt: update_cache=yes
+  when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+- name: Install Erlang/Elixir build dependencies from apt
+  apt: 
+    pkg:   "{{ item }}"
+    state: present
+  with_items: [ build-essential, openssl, libssl-dev, libncurses5, libncurses5-dev, inotify-tools ]
+  when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+
+- name: Clone the Erlang repo
+  git:
+    repo:    "{{ erlang_repo }}"
+    dest:    "{{ erlang_build_dir }}"
+    version: "{{ erlang_tag }}"
+    clone:   "yes"
+    update:  "yes"
+    force:   "yes"
+  when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' 
+
+- name: Build Erlang
+  shell: >
+    cd "{{ erlang_build_dir }}" &&
+    ./otp_build autoconf &&
+    ./configure --with-ssl --enable-m64-build --disable-hipe --enable-smp-support --enable-threads --enable-kernel-poll &&
+    make &&
+    make install &&
+    echo '{{ erlang_repo }}@{{ erlang_tag }}' > /etc/erlang_version
+  when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' 
+
+- name: Clone the Elixir repo
+  git:
+    repo:    "{{ elixir_repo }}"
+    dest:    "{{ elixir_build_dir }}"
+    version: "{{ elixir_tag }}"
+    clone:   "yes"
+    update:  "yes"
+    force:   "yes"
+  when: current_elixir_version.stdout != '{{ elixir_repo }}@{{ elixir_tag }}'
+
+- name: Build Elixir
+  shell: >
+    cd "{{ elixir_build_dir }}" &&
+    make &&
+    make install &&
+    echo '{{ elixir_repo }}@{{ elixir_tag }}' > /etc/elixir_version
+  when: current_elixir_version.stdout != '{{ elixir_repo }}@{{ elixir_tag }}'
+
+
+

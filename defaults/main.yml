@@ -1,0 +1,8 @@
+
+erlang_repo:      "https://github.com/erlang/otp.git"
+erlang_tag:       "OTP-19.3.1"
+erlang_build_dir: "/tmp/erlang"
+
+elixir_repo:      "https://github.com/elixir-lang/elixir.git"
+elixir_tag:       "v1.4.2"
+elixir_build_dir: "/tmp/elixir"
