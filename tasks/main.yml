@@ -16,9 +16,14 @@
   apt: 
     pkg:   "{{ item }}"
     state: present
-  with_items: [ build-essential, openssl, libssl-dev, libkrb5-dev, libncurses5, libncurses5-dev, inotify-tools ]
+  with_items: [ build-essential, libncurses5, libncurses5-dev, inotify-tools ]
   when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
+- name: Clone the OpenSSL repo we are going to compile Erlang against
+  git:
+    repo: "{{ erlang_openssl_repo }}"
+    dest: "{{ erlang_build_dir }}/openssl-repo"
+    version: "{{ erlang_openssl_revision }}"
 
 - name: Clone the Erlang repo
   git:
@@ -34,7 +39,7 @@
   shell: >
     cd "{{ erlang_build_dir }}" &&
     ./otp_build autoconf &&
-    ./configure --with-ssl=/usr --enable-m64-build --disable-hipe --enable-smp-support --enable-threads --enable-kernel-poll &&
+    ./configure --with-ssl="{{ erlang_build_dir }}/openssl-repo" --disable-dynamic-ssl-lib --enable-m64-build --disable-hipe --enable-smp-support --enable-threads --enable-kernel-poll &&
     make &&
     make install &&
     echo '{{ erlang_repo }}@{{ erlang_tag }}' > /etc/erlang_version

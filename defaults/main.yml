@@ -1,7 +1,12 @@
 
-erlang_repo:      "https://github.com/erlang/otp.git"
-erlang_tag:       "OTP-19.3.2"
-erlang_build_dir: "/tmp/erlang"
+# erlang doesn't build with latest openssl (1.1.x), so we need 
+# to specify an earlier version and build against that
+erlang_repo:             "https://github.com/erlang/otp.git"
+erlang_tag:              "OTP-19.3.2"
+erlang_build_dir:        "/tmp/erlang"
+erlang_openssl_repo:     "https://github.com/openssl/openssl"
+erlang_openssl_revision: "OpenSSL_1_0_2k"
+
 
 elixir_repo:      "https://github.com/elixir-lang/elixir.git"
 elixir_tag:       "v1.4.2"
