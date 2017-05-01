@@ -34,7 +34,7 @@
   shell: >
     cd "{{ erlang_build_dir }}" &&
     ./otp_build autoconf &&
-    ./configure --with-ssl --enable-m64-build --disable-hipe --enable-smp-support --enable-threads --enable-kernel-poll &&
+    ./configure --with-ssl=/usr --enable-m64-build --disable-hipe --enable-smp-support --enable-threads --enable-kernel-poll &&
     make &&
     make install &&
     echo '{{ erlang_repo }}@{{ erlang_tag }}' > /etc/erlang_version
