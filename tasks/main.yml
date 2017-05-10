@@ -16,7 +16,7 @@
   apt: 
     pkg:   "{{ item }}"
     state: present
-  with_items: [ build-essential, libncurses5, libncurses5-dev, inotify-tools ]
+  with_items: [ build-essential, git, libncurses5, libncurses5-dev, inotify-tools ]
   when: current_erlang_version.stdout != '{{ erlang_repo }}@{{ erlang_tag }}' and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
 - name: Clone the Erlang repo
